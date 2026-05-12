@@ -10,6 +10,10 @@ from llama_index.vector_stores.postgres import PGVectorStore
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.gemini import Gemini
 
+from fastapi import Security, HTTPException
+from fastapi.security.api_key import APIKeyHeader
+from starlette.status import HTTP_403_FORBIDDEN
+
 def load_config():
     Settings.llm = Gemini(model="gemini-3-flash-preview",
                           temperature=0.5,
@@ -52,4 +56,13 @@ def load_config():
         {"response_synthesizer:text_qa_template": my_prompt_template}
     )
 
-    return query_engine
+    SECRET_KEY = os.getenv("SECRET_KEY")
+
+    api_key_header = APIKeyHeader(name="X-API-KEY", auto_error=False)
+
+    def get_api_key(api_key: str = Security(api_key_header)):
+        if api_key == SECRET_KEY:
+            return api_key
+        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Invalid API Key")
+
+    return query_engine, get_api_key
