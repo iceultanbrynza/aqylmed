@@ -14,6 +14,10 @@ from fastapi import Security, HTTPException
 from fastapi.security.api_key import APIKeyHeader
 from starlette.status import HTTP_403_FORBIDDEN
 
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+api_key_header = APIKeyHeader(name="X-API-KEY", auto_error=False)
+
 def load_config():
     Settings.llm = Gemini(model="gemini-3-flash-preview",
                           temperature=0.5,
@@ -50,19 +54,15 @@ def load_config():
     my_prompt_template = PromptTemplate(my_prompt_text)
 
     query_engine = index.as_query_engine(similarity_top_k=1,
-                                         metadata_mode="llm" )
+                                         metadata_mode="llm")
 
     query_engine.update_prompts(
         {"response_synthesizer:text_qa_template": my_prompt_template}
     )
 
-    SECRET_KEY = os.getenv("SECRET_KEY")
+    return query_engine
 
-    api_key_header = APIKeyHeader(name="X-API-KEY", auto_error=False)
-
-    def get_api_key(api_key: str = Security(api_key_header)):
-        if api_key == SECRET_KEY:
-            return api_key
-        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Invalid API Key")
-
-    return query_engine, get_api_key
+async def get_api_key(api_key: str = Security(api_key_header)):
+    if api_key == SECRET_KEY:
+        return api_key
+    raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Invalid API Key")
