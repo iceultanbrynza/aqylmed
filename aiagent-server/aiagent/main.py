@@ -7,8 +7,10 @@ from aiagent.serializers import QueryRequest
 from fastapi.applications import FastAPI
 from fastapi import Depends, HTTPException
 
-from llama_index.core import QueryBundle
-from llama_index.core.vector_stores import MetadataFilters, MetadataFilter, FilterOperator
+from llama_index.core.vector_stores import (MetadataFilters,
+                                            MetadataFilter,
+                                            FilterOperator,
+                                            FilterCondition)
 
 state = {}
 
@@ -28,11 +30,24 @@ app = FastAPI(lifespan=lifespan)
 async def agent(query: QueryRequest):
     query_engine = state["query_engine"]
     if query.filters:
-        node_filters = [
-            MetadataFilter(key=k, value=v, operator=FilterOperator.EQ)
-            for k, v in query.filters.items()
-        ]
-        query_engine.retriever._filters = MetadataFilters(filters=node_filters)
+
+        node_filters = []
+        for f in query.filters:
+            if len(f.values) == 1:
+
+                node_filters.append(MetadataFilter(key=f.key,
+                                                   value=f.values[0],
+                                                   operator=FilterOperator.EQ))
+            else:
+                node_filters.append(MetadataFilters(filters=[MetadataFilter(key=f.key,
+                                                                            value=v,
+                                                                            operator=FilterOperator.EQ)
+                                                            for v in f.values],
+                                                    condition=FilterCondition.OR)
+                                    )
+
+            query_engine.retriever._filters = MetadataFilters(filters=node_filters,
+                                                              condition=FilterCondition.AND )
 
     try:
         response = await query_engine.aquery(query.query)
