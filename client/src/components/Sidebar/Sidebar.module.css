@@ -1,0 +1,145 @@
+.sidebar {
+	width: 280px;
+	min-height: 100vh;
+	padding: 28px 18px 20px 22px;
+	background: linear-gradient(180deg, #ffffff 0%, #fcfdff 100%);
+	border-right: 1px solid var(--border);
+	box-shadow: 10px 0 30px rgba(15, 23, 42, 0.04);
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+	flex: 0 0 280px;
+	top: 0;
+	align-self: flex-start;
+}
+
+.sidebarTitle {
+	margin: 0;
+	font-size: 1.25rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	color: var(--text-heading);
+}
+
+.sidebarSubtitle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+	font-size: 0.7rem;
+	font-weight: 500;
+	letter-spacing: 0.3em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+}
+
+.sidebarSubtitle span {
+	white-space: nowrap;
+}
+
+.delimeterCircle {
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: #c7ced9;
+	flex: 0 0 auto;
+}
+
+.logoContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.navLinksContainer {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 8px;
+	padding-top: 10px;
+}
+
+.navLink,
+.activeLink {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-height: 44px;
+	padding: 0 14px;
+	border-radius: 14px;
+	text-decoration: none;
+	font-size: 0.95rem;
+	font-weight: 500;
+	line-height: 1;
+	transition:
+		background-color var(--transition),
+		color var(--transition),
+		box-shadow var(--transition),
+		transform var(--transition);
+}
+
+.navLink {
+	color: var(--text-main);
+}
+
+.navLink:hover {
+	background: rgba(26, 162, 76, 0.06);
+	color: var(--text-heading);
+}
+
+.activeLink {
+	color: #ffffff;
+	background: linear-gradient(135deg, var(--med-green) 0%, #24b157 100%);
+	box-shadow: 0 10px 24px rgba(26, 162, 76, 0.22);
+}
+
+.activeLink:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 12px 28px rgba(26, 162, 76, 0.28);
+}
+
+.navIcon {
+	width: 18px;
+	height: 18px;
+	flex: 0 0 auto;
+	stroke-width: 2.1px;
+}
+
+.navLink .navIcon {
+	color: var(--text-muted);
+}
+
+.navLink:hover .navIcon {
+	color: var(--med-green);
+}
+
+.activeLink .navIcon {
+	color: #ffffff;
+}
+
+.navLink span,
+.activeLink span {
+	white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+	.sidebar {
+		width: 248px;
+		padding: 24px 14px 18px 16px;
+	}
+
+	.sidebarSubtitle {
+		letter-spacing: 0.22em;
+	}
+}
+
+@media (max-width: 720px) {
+	.sidebar {
+		width: 100%;
+		flex-basis: 100%;
+		min-height: auto;
+		border-right: 0;
+		border-bottom: 1px solid var(--border);
+		box-shadow: none;
+	}
+}
