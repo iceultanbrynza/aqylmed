@@ -16,7 +16,7 @@ class Material(models.Model):
                                      default=TypeEnum.BOOK)
     title = models.CharField(max_length=255)
     author_name = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(null=True, blank=True)
     language = models.CharField(max_length=5)
 
 class DisciplineTranslation(models.Model):
@@ -50,6 +50,7 @@ class MaterialDiscipline(models.Model):
             )
         ]
 
+# should have user field
 class Collection(models.Model):
     title = models.CharField(max_length=255)
     is_public = models.BooleanField(default=True)
@@ -88,3 +89,40 @@ class Media(models.Model):
     material = models.OneToOneField(Material,
                                  on_delete=models.CASCADE,
                                  related_name="media")
+
+# should have user field
+class Thematics(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+    is_public = models.BooleanField(default=False)
+    quiz_count = models.SmallIntegerField()
+    flashcards_count = models.SmallIntegerField()
+    collection = models.ForeignKey(Collection,
+                                   on_delete=models.CASCADE,
+                                   related_name="thematics")
+
+class Quiz(models.Model):
+    class DifficultyEnum(models.TextChoices):
+        EASY = "Easy"
+        MEDIUM = "Medium"
+        HARD = "HARD"
+
+    title = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+    questions_count = models.SmallIntegerField()
+    questions = models.JSONField()
+    difficulty = models.CharField(max_length=10,
+                                  choices=DifficultyEnum,
+                                  default=DifficultyEnum.MEDIUM)
+    thematics = models.ForeignKey(Thematics,
+                                  on_delete=models.CASCADE,
+                                  related_name="quizes")
+
+class Flashcard(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+    cards_count = models.SmallIntegerField()
+    cards = models.JSONField()
+    thematics = models.ForeignKey(Thematics,
+                                  on_delete=models.CASCADE,
+                                  related_name="flashcards")
