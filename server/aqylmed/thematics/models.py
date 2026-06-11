@@ -91,7 +91,7 @@ class Media(models.Model):
                                  related_name="media")
 
 # should have user field
-class Thematics(models.Model):
+class Thematic(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     is_public = models.BooleanField(default=False)
@@ -108,21 +108,26 @@ class Quiz(models.Model):
         HARD = "HARD"
 
     title = models.CharField(max_length=255)
-    description = models.TextField(null=True, blank=True)
     questions_count = models.SmallIntegerField()
     questions = models.JSONField()
     difficulty = models.CharField(max_length=10,
                                   choices=DifficultyEnum,
                                   default=DifficultyEnum.MEDIUM)
-    thematics = models.ForeignKey(Thematics,
+    thematics = models.ForeignKey(Thematic,
                                   on_delete=models.CASCADE,
-                                  related_name="quizes")
+                                  related_name="quizzes")
 
 class Flashcard(models.Model):
     title = models.CharField(max_length=255)
-    description = models.TextField(null=True, blank=True)
     cards_count = models.SmallIntegerField()
     cards = models.JSONField()
-    thematics = models.ForeignKey(Thematics,
+    thematics = models.ForeignKey(Thematic,
                                   on_delete=models.CASCADE,
                                   related_name="flashcards")
+
+class Message(models.Model):
+    content = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+    thematics = models.ForeignKey(Thematic,
+                                  on_delete=models.CASCADE,
+                                  related_name="messages")
