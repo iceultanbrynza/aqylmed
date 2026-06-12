@@ -15,6 +15,7 @@ from fastapi.security.api_key import APIKeyHeader
 from starlette.status import HTTP_403_FORBIDDEN
 
 SECRET_KEY = os.getenv("SECRET_KEY")
+ALLOWED_ORIGINS = os.getenv("ORIGIN")
 
 api_key_header = APIKeyHeader(name="X-API-KEY", auto_error=False)
 
@@ -39,30 +40,14 @@ def load_config():
         vector_store=vector_store
     )
 
-    my_prompt_text = (
-        "Ты — академический ассистент. Используй этот текст из учебника:\n"
-        "---------------------\n"
-        "{context_str}\n"
-        "---------------------\n"
-        "Ответь на вопрос студента: {query_str}\n"
-        "Правила ответа:\n"
-        "1. Приоритет источника: Всегда начинай ответ с предоставленного контекста учебника. Если в контексте есть прямой ответ, начни с него.\n"
-        "2. Цитирование: При использовании информации из контекста, делай сноску в формате: (Учебник: 'Название', Автор: 'Имя').\n"
-        "3. Дополнение: После разбора материала из учебника, дополни ответ актуальными данными из внешних источников (интернет-знаний), чтобы дать студенту полную картину. Выделяй это фразой: 'Дополнительно стоит отметить...'"
-
-    )
-    my_prompt_template = PromptTemplate(my_prompt_text)
-
     query_engine = index.as_query_engine(similarity_top_k=1,
                                          metadata_mode="llm")
-
-    query_engine.update_prompts(
-        {"response_synthesizer:text_qa_template": my_prompt_template}
-    )
 
     return query_engine
 
 async def get_api_key(api_key: str = Security(api_key_header)):
+    logging.info(f"api_key: {repr(api_key)}")
+    logging.info(f"secret: {repr(SECRET_KEY)}")
     if api_key == SECRET_KEY:
         return api_key
     raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Invalid API Key")
